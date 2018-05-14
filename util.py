@@ -201,7 +201,7 @@ def eval_accuracy(predict_lists):
 
 row = 0
 col = 0
-workbook = xlsxwriter.Workbook('/Users/binhnguyen/Desktop/test.xlsx')
+workbook = xlsxwriter.Workbook('/Users/binhnguyen/Desktop/test-gold.xlsx')
 worksheet = workbook.add_worksheet()
 worksheet.write(row, col, "Item")
 worksheet.write(row, col + 1, "Gold")
@@ -284,7 +284,7 @@ def conll_eval(gold_predict_pairs, flag=True, tag_class=None):
         gold_range_set = set(gold_phrases)
         predict_range_set = set(predict_phrases)
         global number_err
-        if (len(predict_range_set - gold_range_set) != 0):
+        if (len(gold_range_set - predict_range_set) != 0):
             number_err+=1
             tool(gold_range_set, predict_range_set, row)
 
@@ -398,14 +398,17 @@ def tool(gold_range_set, predict_range_set, row):
     global noannotation, flag, temp, number_err
     predict = sorted(predict_range_set - gold_range_set)
     gold = sorted(gold_range_set -predict_range_set)
-    for a in predict:
-        
+    for a in gold:
+        if(len(predict) == 0):
+            noannotation+=1
+            worksheet.write(row+1+a[0], 3, "E")
+
         temp = 0
-        for b in gold:
+        for b in predict:
             check_duplicate(a,b,row)
-            if(temp==len(gold)):
+            if(temp==len(predict)):
                 noannotation+=1
-                worksheet.write(row+1+a[0], 3, "A")
+                worksheet.write(row+1+a[0], 3, "E")
                 flag = True
                 temp=0
             if flag:
